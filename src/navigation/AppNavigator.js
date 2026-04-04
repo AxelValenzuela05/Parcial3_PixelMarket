@@ -9,12 +9,13 @@ import ProductListScreen from "../screens/ProductListScreen";
 import ProductDetailScreen from "../screens/ProductDetailScreen";
 import CartScreen from "../screens/CartScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import FavoritesScreen from "../screens/FavoritesScreen"; // nueva pantalla
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Stack para Home y productos
-function HomeStack({ cart, setCart }) {
+function HomeStack({ cart, setCart, favorites, setFavorites }) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -28,7 +29,13 @@ function HomeStack({ cart, setCart }) {
       <Stack.Screen name="ProductList" component={ProductListScreen} />
       <Stack.Screen name="ProductDetail">
         {(props) => (
-          <ProductDetailScreen {...props} cart={cart} setCart={setCart} />
+          <ProductDetailScreen
+            {...props}
+            cart={cart}
+            setCart={setCart}
+            favorites={favorites}
+            setFavorites={setFavorites}
+          />
         )}
       </Stack.Screen>
     </Stack.Navigator>
@@ -37,6 +44,7 @@ function HomeStack({ cart, setCart }) {
 
 export default function AppNavigator() {
   const [cart, setCart] = useState([]);
+  const [favorites, setFavorites] = useState([]); // ✅ ahora sí existe
 
   return (
     <NavigationContainer>
@@ -50,16 +58,27 @@ export default function AppNavigator() {
             let iconName;
             if (route.name === "Inicio") iconName = "home";
             else if (route.name === "Carrito") iconName = "cart";
+            else if (route.name === "Favoritos") iconName = "heart";
             else if (route.name === "Perfil") iconName = "person";
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}
       >
         <Tab.Screen name="Inicio">
-          {() => <HomeStack cart={cart} setCart={setCart} />}
+          {() => (
+            <HomeStack
+              cart={cart}
+              setCart={setCart}
+              favorites={favorites}
+              setFavorites={setFavorites}
+            />
+          )}
         </Tab.Screen>
         <Tab.Screen name="Carrito">
           {() => <CartScreen cart={cart} setCart={setCart} />}
+        </Tab.Screen>
+        <Tab.Screen name="Favoritos">
+          {() => <FavoritesScreen favorites={favorites} setFavorites={setFavorites} />}
         </Tab.Screen>
         <Tab.Screen name="Perfil" component={ProfileScreen} />
       </Tab.Navigator>
